@@ -1,10 +1,14 @@
 package miniblog
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+var cfgFile string
 
 // NewMiniBlogCommand 创建一个 *cobra.Command 对象，之后，可以使用 Command 对象的 Execute 方法来启动应用程序
 func NewMiniBlogCommand() *cobra.Command {
@@ -16,6 +20,7 @@ func NewMiniBlogCommand() *cobra.Command {
 		Short: "迷你博客",
 		// 命令的详细描述
 		Long: `A good Go practical project，迷你博客。
+
 Find more miniblog infomation at:
 		https://github.com/sjxiang/miniblog#readme`,
 		// 命令出错时，不打印帮助信息。（不需要，设置为 true，可以保持命令出错时一眼就能看到错误信息）
@@ -26,8 +31,8 @@ Find more miniblog infomation at:
 		},
 		// 内置`验证`函数
 		// Args: cobra.MinimumNArgs(1),
-		
-		// 命令 Runtime，自定义`验证`函数（不需要指定命令行参数）
+
+		// 自定义`验证`函数（不需要指定命令行参数）
 		Args: func(cmd *cobra.Command, args []string) error {
 			for _, arg := range args {
 				if len(arg) > 0 {
@@ -39,11 +44,28 @@ Find more miniblog infomation at:
 		},
 	}
 
+	// 以下设置，使得 initConfig() 在每个运行时都会被调用以读取配置
+	cobra.OnInitialize(initConfig)
+
+	// 在这里您将定义标志和配置设置
+
+	// Cobra 支持持久性标志（PersistentFlags），该标志可用于它所分配的命令以及该命令下的每个子命令
+	cmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "miniblog 的配置文件路径，若字符串为空，则无配置文件")
+
+	// Cobra 也支持本地标志，本地标志只能在其所绑定的命令上使用
+	cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
 	return cmd
 }
 
 // run 实际的业务代码入口
 func run() error {
+
+	// 打印所有的配置项及其值
+	settings, _ := json.Marshal(viper.AllSettings())
+	fmt.Println(string(settings))
+	fmt.Println(viper.GetString("db.username"))
+
 	fmt.Println("Hello MiniBlog")
 	return nil
 }
