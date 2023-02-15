@@ -1,3 +1,4 @@
+
 # ==============================================================================
 # 定义全局 Makefile 变量方便后面引用
 
@@ -34,3 +35,8 @@ tidy: # 自动添加/移除依赖包.
 .PHONY: clean
 clean: # 清理构建产物、临时文件等.
 	@-rm -vrf $(OUTPUT_DIR)
+
+print:
+	@echo $(MAKEFILE_LIST)
+	@echo $(lastword $(MAKEFILE_LIST))
+	@echo $(dir $(lastword $(MAKEFILE_LIST)))
