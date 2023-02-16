@@ -1,14 +1,15 @@
 package miniblog
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+	// env     *Env
+)
 
 // NewMiniBlogCommand 创建一个 *cobra.Command 对象，之后，可以使用 Command 对象的 Execute 方法来启动应用程序
 func NewMiniBlogCommand() *cobra.Command {
@@ -27,6 +28,11 @@ Find more miniblog infomation at:
 		SilenceUsage: true,
 		// 指定调用 cmd.Execute() 时，执行的 Run 函数，函数执行失败会返回错误信息
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// 加载配置
+			// env = NewEnv(cfgFile)
+			// 初始化日志
+
+
 			return run()
 		},
 		// 内置`验证`函数
@@ -44,8 +50,9 @@ Find more miniblog infomation at:
 		},
 	}
 
-	// 以下设置，使得 initConfig() 在每个运行时都会被调用以读取配置
-	cobra.OnInitialize(initConfig)
+	// 正常：Execute() -> Run()
+	// 加塞：Execute() -> init() -> Run()
+	// cobra.OnInitialize()
 
 	// 在这里您将定义标志和配置设置
 
@@ -53,7 +60,7 @@ Find more miniblog infomation at:
 	cmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "miniblog 的配置文件路径，若字符串为空，则无配置文件")
 
 	// Cobra 也支持本地标志，本地标志只能在其所绑定的命令上使用
-	cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	return cmd
 }
@@ -61,11 +68,8 @@ Find more miniblog infomation at:
 // run 实际的业务代码入口
 func run() error {
 
-	// 打印所有的配置项及其值
-	settings, _ := json.Marshal(viper.AllSettings())
-	fmt.Println(string(settings))
-	fmt.Println(viper.GetString("db.username"))
+	env := NewEnv(cfgFile)
+	fmt.Println(env.AppEnv)
 
-	fmt.Println("Hello MiniBlog")
 	return nil
 }
