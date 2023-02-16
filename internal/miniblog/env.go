@@ -14,7 +14,7 @@ func NewEnv(filePath string) *Env {
 	env := Env{}
 
 	// 从命令行选项指定的配置文件中读取
-	viper.SetConfigFile(filePath) //  ".env" "./.env" 都行
+	viper.SetConfigFile(filePath) //  ".env" && "./.env" 都行
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal("Can't find the file .env: ", err)

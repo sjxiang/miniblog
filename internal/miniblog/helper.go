@@ -1,0 +1,5 @@
+package miniblog
+
+func logOptions() {
+
+}

@@ -8,7 +8,7 @@ import (
 
 var (
 	cfgFile string
-	// env     *Env
+	env     *Env
 )
 
 // NewMiniBlogCommand 创建一个 *cobra.Command 对象，之后，可以使用 Command 对象的 Execute 方法来启动应用程序
@@ -29,9 +29,8 @@ Find more miniblog infomation at:
 		// 指定调用 cmd.Execute() 时，执行的 Run 函数，函数执行失败会返回错误信息
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// 加载配置
-			// env = NewEnv(cfgFile)
+			env = NewEnv(cfgFile)
 			// 初始化日志
-
 
 			return run()
 		},
@@ -57,7 +56,8 @@ Find more miniblog infomation at:
 	// 在这里您将定义标志和配置设置
 
 	// Cobra 支持持久性标志（PersistentFlags），该标志可用于它所分配的命令以及该命令下的每个子命令
-	cmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "miniblog 的配置文件路径，若字符串为空，则无配置文件")
+	// Flag
+	cmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "miniblog 的配置文件路径，若字符串为空，则为无配置文件。")
 
 	// Cobra 也支持本地标志，本地标志只能在其所绑定的命令上使用
 	// cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
@@ -68,7 +68,7 @@ Find more miniblog infomation at:
 // run 实际的业务代码入口
 func run() error {
 
-	env := NewEnv(cfgFile)
+	// env := NewEnv(cfgFile)
 	fmt.Println(env.AppEnv)
 
 	return nil
