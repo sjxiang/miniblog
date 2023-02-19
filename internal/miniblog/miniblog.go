@@ -1,9 +1,14 @@
 package miniblog
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
+
+	"github.com/sjxiang/miniblog/internal/pkg/log"
 )
 
 var (
@@ -28,9 +33,13 @@ Find more miniblog infomation at:
 		SilenceUsage: true,
 		// 指定调用 cmd.Execute() 时，执行的 Run 函数，函数执行失败会返回错误信息
 		RunE: func(cmd *cobra.Command, args []string) error {
+
 			// 加载配置
 			env = NewEnv(cfgFile)
+
 			// 初始化日志
+			log.Init(logOptions())
+			defer log.Sync() // Sync 将缓存中的日志刷新到磁盘文件中
 
 			return run()
 		},
@@ -68,8 +77,39 @@ Find more miniblog infomation at:
 // run 实际的业务代码入口
 func run() error {
 
-	// env := NewEnv(cfgFile)
-	fmt.Println(env.AppEnv)
+	log.Infow("Using config file", "file", env)
+
+	// 设置 Gin 模式
+	gin.SetMode(env.RunMode)
+
+	g := gin.New()
+
+	// 注册 404
+	g.NoRoute(func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"Code":    10003,
+			"message": "Page not found",
+		})
+	})
+
+	// 健康检查
+	g.GET("/healthz", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"status": "OK",
+		})
+	})
+
+	// 创建 HTTP Server 实例
+	httpsrv := &http.Server{
+		Addr:    env.Addr,
+		Handler: g,
+	}
+
+	// 运行 HTTP 服务器
+	log.Infow("开始监听 HTTP 地址上的请求", "addr", env.Addr)
+	if err := httpsrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatalw(err.Error())
+	}
 
 	return nil
 }

@@ -8,7 +8,6 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-
 // Logger 定义了 miniblog 项目的日志接口，该接口只包含了支持的日志记录方法（还缺点东西）
 type Logger interface {
 	Debugw(msg string, keyAndValues ...interface{})
@@ -20,7 +19,6 @@ type Logger interface {
 	Sync()
 }
 
-
 // zapLogger 是 Logger 接口的具体实现，它底层封装了 zap.Logger
 type zapLogger struct {
 	z *zap.Logger
@@ -29,11 +27,10 @@ type zapLogger struct {
 // 确保 zapLogger 实现了 Logger 接口. 以下变量赋值，可以使错误在编译期被发现.
 var _ Logger = &zapLogger{}
 
-
 var (
 	mu sync.Mutex
 
-	// std 定义了默认的全局 Logger 
+	// std 定义了默认的全局 Logger
 	std = NewLogger(NewOptions())
 )
 
@@ -43,7 +40,7 @@ func Init(opts *Options) {
 	defer mu.Unlock()
 
 	std = NewLogger(opts)
-} 
+}
 
 // NewLogger 根据传入的 opts 创建 Logger
 func NewLogger(opts *Options) *zapLogger {
@@ -98,14 +95,25 @@ func NewLogger(opts *Options) *zapLogger {
 	}
 	logger := &zapLogger{z: z}
 
-	// 把标准库的 log.Logger 的 info 级别的输出重定向到 zap.Logger
+	// 把标准库的 log.Logger 的 info 级别的输出重定向到 zap.Logger（有点误解）
 	zap.RedirectStdLog(z)
 
 	return logger
 }
 
+/*
+	讲究，两套，一个实现 interface，一个 pkg 方便随处用）
 
-// Debugw 输出 debug 级别的日志. （讲究，两套，一个实现 interface，一个 pkg 方便随处用）
+
+	// 丑陋的写法
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		log.Logger.Errorw("Invalid ID")
+	}
+
+*/
+
+// Debugw 输出 debug 级别的日志.
 func Debugw(msg string, keysAndValues ...interface{}) {
 	std.z.Sugar().Debugw(msg, keysAndValues...)
 }
