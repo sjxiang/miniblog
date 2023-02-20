@@ -1,14 +1,19 @@
 package miniblog
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 
 	"github.com/sjxiang/miniblog/internal/pkg/log"
+	mw "github.com/sjxiang/miniblog/internal/pkg/middleware"
 )
 
 var (
@@ -65,7 +70,8 @@ Find more miniblog infomation at:
 	// 在这里您将定义标志和配置设置
 
 	// Cobra 支持持久性标志（PersistentFlags），该标志可用于它所分配的命令以及该命令下的每个子命令
-	// Flag
+
+	// 定义标准 Flag
 	cmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "miniblog 的配置文件路径，若字符串为空，则为无配置文件。")
 
 	// Cobra 也支持本地标志，本地标志只能在其所绑定的命令上使用
@@ -83,6 +89,12 @@ func run() error {
 	gin.SetMode(env.RunMode)
 
 	g := gin.New()
+	mws := []gin.HandlerFunc{
+		gin.Recovery(), // 从任何一个 panic 中恢复，并返回 500
+		mw.RequestID(),
+		mw.Cors(),
+	}
+	g.Use(mws...)
 
 	// 注册 404
 	g.NoRoute(func(ctx *gin.Context) {
@@ -94,6 +106,8 @@ func run() error {
 
 	// 健康检查
 	g.GET("/healthz", func(ctx *gin.Context) {
+		log.C(ctx).Infow("健康检查调用")
+
 		ctx.JSON(http.StatusOK, gin.H{
 			"status": "OK",
 		})
@@ -107,9 +121,26 @@ func run() error {
 
 	// 运行 HTTP 服务器
 	log.Infow("开始监听 HTTP 地址上的请求", "addr", env.Addr)
-	if err := httpsrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatalw(err.Error())
+	go func() {
+		if err := httpsrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalw(err.Error())
+		}
+	}()
+
+	// 开始监听系统信号（优雅关停）
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, signals...)
+	<-quit
+	log.Infow("Shutting down server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := httpsrv.Shutdown(ctx); err != nil {
+		log.Errorw("Insecure Server forced to shutdown", "err", err)
+		return err
 	}
 
+	log.Infow("Server exiting")
 	return nil
 }

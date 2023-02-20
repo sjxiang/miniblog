@@ -1,9 +1,11 @@
 package log
 
 import (
+	"context"
 	"sync"
 	"time"
 
+	"github.com/sjxiang/miniblog/internal/pkg/consts"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -172,4 +174,25 @@ func Sync() { std.Sync() }
 
 func (l *zapLogger) Sync() {
 	_ = l.z.Sync()
+}
+
+// C 解析传入的 contetx，尝试提取关注的键值，并添加到 zap.Logger 结构化日志中
+func C(ctx context.Context) *zapLogger {
+	return std.C(ctx)
+}
+
+func (l *zapLogger) C(ctx context.Context) *zapLogger {
+	lc := l.clone()
+
+	if requestID := ctx.Value(consts.XRequestIDKey); requestID != nil {
+		lc.z = lc.z.With(zap.Any(consts.XRequestIDKey, requestID))
+	}
+
+	return lc
+}
+
+// clone 深度拷贝 zapLogger（用户打上烙印，服务器白纸一张，可不能混淆；新建拷贝一份）
+func (l *zapLogger) clone() *zapLogger {
+	lc := *l
+	return &lc
 }

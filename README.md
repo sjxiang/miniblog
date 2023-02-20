@@ -13,3 +13,16 @@ Go 应用组成
     2. 业务逻辑
     3. 启动框架
 
+
+
+Web 服务，技术选型（API 风格和数据交换格式）
+
+    1. HTTP + JSON
+    2. RPC + Protobuf
+
+
+中间件
+
+    在日志中打印 X-Request-ID
+    跨域
+    优雅关停
