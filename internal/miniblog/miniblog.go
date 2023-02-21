@@ -12,6 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 
+	"github.com/sjxiang/miniblog/internal/pkg/core"
+	"github.com/sjxiang/miniblog/internal/pkg/errno"
 	"github.com/sjxiang/miniblog/internal/pkg/log"
 	mw "github.com/sjxiang/miniblog/internal/pkg/middleware"
 )
@@ -98,18 +100,15 @@ func run() error {
 
 	// 注册 404
 	g.NoRoute(func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"Code":    10003,
-			"message": "Page not found",
-		})
+		core.WithResponse(ctx, errno.ErrPageNotFound, nil)
 	})
 
 	// 健康检查
 	g.GET("/healthz", func(ctx *gin.Context) {
 		log.C(ctx).Infow("健康检查调用")
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"status": "OK",
+		core.WithResponse(ctx, nil, map[string]string{
+			"status": "Ok",
 		})
 	})
 
