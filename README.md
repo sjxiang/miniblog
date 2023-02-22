@@ -14,6 +14,16 @@ Go 应用组成
     3. 启动框架
 
 
+Cobra 平替方案 （无语猫猫）
+
+    // Env 会在编译的时候注入值
+    // Env go build -ldflags "-X 'main.Env=aaa'"
+    var Env = "dev"
+
+
+配置文件加载
+
+日志
 
 Web 服务，技术选型（API 风格和数据交换格式）
 
@@ -26,3 +36,11 @@ Web 服务，技术选型（API 风格和数据交换格式）
     在日志中打印 X-Request-ID
     跨域
     优雅关停
+    限流
+
+
+错误码和组装 Response
+
+序列化
+
+

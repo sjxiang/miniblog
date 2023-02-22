@@ -2,7 +2,7 @@ package log
 
 import "go.uber.org/zap/zapcore"
 
-// TODO
+// Custom 定制
 
 // 设置 Log Entry 格式
 func customEncoder() *zapcore.Encoder {
@@ -13,3 +13,5 @@ func customEncoder() *zapcore.Encoder {
 func customLogWriter() zapcore.WriteSyncer {
 	return nil
 }
+
+

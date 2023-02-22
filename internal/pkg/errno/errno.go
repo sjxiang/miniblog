@@ -4,8 +4,8 @@ import "fmt"
 
 type ErrNo struct {
 	Status  int    // HTTP 状态码
-	BizCode string // 业务错误码
-	Message string // 可直接暴露给用户的错误信息
+	BizCode string // 业务错误码  （为啥不是打日志呢？感觉挺扯淡的）
+	Message string // 可直接暴露给用户的错误信息   
 }
 
 // 实现 error 接口中的 `Error` 方法

@@ -103,15 +103,11 @@ func NewLogger(opts *Options) *zapLogger {
 	return logger
 }
 
-/*
-	讲究，两套，一个实现 interface，一个 pkg 方便随处用）
+/* 
 
-
-	// 丑陋的写法
-	i, err := strconv.Atoi(id)
-	if err != nil {
-		log.Logger.Errorw("Invalid ID")
-	}
+	两套实现，
+	1. 接口确保完备
+	2. 方便使用 log.Infow()  或者依赖注入实现，就是很多代码要写
 
 */
 

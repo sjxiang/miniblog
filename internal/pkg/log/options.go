@@ -26,3 +26,13 @@ func NewOptions() *Options {
 		OutputPaths:       []string{"stdout"},
 	}
 }
+
+
+
+/*
+
+使用思路
+
+	Init() -> std 替换备用
+
+*/

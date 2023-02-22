@@ -7,7 +7,13 @@ import (
 	"github.com/sjxiang/miniblog/internal/pkg/errno"
 )
 
-// 序列化器 serializer
+
+/*
+
+	序列化器 serializer
+
+*/ 
+
 
 // 定义了发生错误时的返回信息
 type ErrResponse struct {
