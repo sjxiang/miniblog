@@ -7,30 +7,41 @@ import (
 )
 
 func Cors() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
+	return func(c *gin.Context) {
 
-		ctx.Header("Access-Control-Allow-Origin", "*")
-		ctx.Header("Access-Control-Allow-Credentials", "true")
-		ctx.Header("Access-Control-Allow-Headers", "authorization, origin, content-type, accept")
-		ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD")
-		ctx.Header("Content-Type", "application/json")
-		ctx.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, "+
-			"Access-Control-Allow-Headers, Authorization, Cache-Control, Content-Language, Content-Type")
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD")
+		c.Header("Access-Control-Allow-Headers", "authorization, origin, content-type, accept")  
+		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Authorization")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Content-Type", "application/json")
 
-		if ctx.Request.Method == "OPTIONS" {
-			ctx.AbortWithStatus(http.StatusNoContent)
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
 			return 
 		}
 
-		ctx.Next()
+		c.Next()
 	}
 }
 
 
 /*
 
-	另一套实现，参考 github.com/gin-contrib/cors
+	Web 开发趋势：
 
-	预检是与浏览器交互探讨，客户端能不能安全发送该请求
+		前后端分离，双方部署的 ip 地址不同，通过 nginx 转发请求
+		
+			vue 192.168.0.2
+			gin 192.168.0.3
+
+
+		但也有安全问题，CSRF 跨站请求伪造（用户在前端误操作，不可以瑟瑟）
+		
+		
+		应对，浏览器同源策略
+
+			浏览器会加塞个 options 请求，header 里有个 Origin 字段，询问下策略；
+			那就回复它，有什么要求，让浏览器自己掂量。
 
 */

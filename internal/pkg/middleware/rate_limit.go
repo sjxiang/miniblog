@@ -8,3 +8,8 @@ func RateLimit() gin.HandlerFunc {
 
 	}
 }
+
+
+// Redis 限流搞一个
+
+// middlewares.RateLimit(2 * time.Second, 1)
