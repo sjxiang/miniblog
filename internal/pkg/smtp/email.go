@@ -14,6 +14,11 @@ import (
 
 redis 测一下不就完了，查重不久完了
 
+
+gopkg.in/gomail.v2
+
+
+
 */
 
 
