@@ -44,3 +44,10 @@ Web 服务，技术选型（API 风格和数据交换格式）
 序列化
 
 
+
+自动化工具
+$ go install github.com/Shelnutt2/db2struct/cmd/db2struct@latest
+
+db2struct --gorm --no-json -H 127.0.0.1 miniblog -t user --struct UserM -p  '123456' --target=user.go
+ 
+db2struct --host=172.21.0.1 --user=gopher --password=123456 --gorm --no-json --package model --struct UserM --database Tables_in_miniblog --table user --target=user.go

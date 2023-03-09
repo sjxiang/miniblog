@@ -84,7 +84,12 @@ Find more miniblog infomation at:
 
 // run 实际的业务代码入口
 func run() error {
+	// 初始化 store 层
+	if err := initStore(); err != nil {
+		return err
+	}
 
+	
 	log.Infow("Using config file", "file", env)
 
 	// 设置 Gin 模式
@@ -111,6 +116,20 @@ func run() error {
 			"status": "Ok",
 		})
 	})
+
+
+	g.GET("/user/confirm", func(ctx *gin.Context) {
+		log.C(ctx).Infow("发送发送验证码") 
+		
+		// account register => 验证邮箱 => 链接 => validatesignup + 时间戳 过期作废 => account login 页面
+		// 感觉也是 url 链接 + 参数
+		// post + 参数
+		
+		core.WithResponse(ctx, nil, map[string]string{
+			"status": "Ok",
+		})
+	})
+
 
 	// 创建 HTTP Server 实例
 	httpsrv := &http.Server{

@@ -3,7 +3,10 @@ package miniblog
 import (
 	"os"
 	"syscall"
+	"time"
 
+	"github.com/sjxiang/miniblog/internal/miniblog/store"
+	"github.com/sjxiang/miniblog/internal/pkg/db"
 	"github.com/sjxiang/miniblog/internal/pkg/log"
 )
 
@@ -25,3 +28,26 @@ var signals = []os.Signal{
 	syscall.SIGQUIT, // ctrl + \
 }
 
+
+// initStore 读取 db 配置，创建 gorm.DB 实例，并初始化 miniblog store 层
+func initStore() error {	
+	dbOptions := &db.MySQLOptions{
+		Host: env.DBHost,
+		UserName: env.DBUsername,
+		Password: env.DBPassword,
+		Database: env.DBDatabase,
+		MaxIdleConnections: env.DBMaxIdleConnections,
+		MaxOpenConnections: env.DBMaxOpenConnections,
+		MaxConnectionLifeTime: time.Duration(env.DBMaxConnectionLifeTime),
+		LogLevel: env.DBLogLevel,
+	}
+
+	ins, err := db.NewMySQL(dbOptions)
+	if err != nil {
+		return err
+	}
+
+	_ = store.NewStore(ins)
+
+	return nil 
+}

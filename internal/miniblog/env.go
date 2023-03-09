@@ -7,14 +7,25 @@ import (
 )
 
 type Env struct {
-	AppEnv string `mapstructure:"APP_ENV"`
+	AppEnv         string   `mapstructure:"APP_ENV"`
 
-	RunMode string `mapstructure:"RUN_MODE"`
-	Addr    string `mapstructure:"ADDR"`
+	RunMode        string   `mapstructure:"RUN_MODE"`
+	Addr           string   `mapstructure:"ADDR"`
 
+	DBHost                  string
+	DBUsername              string
+	DBPassword              string
+	DBDatabase              string
+	DBMaxIdleConnections    int
+	DBMaxOpenConnections    int 
+	DBMaxConnectionLifeTime int
+	DBLogLevel              int
+	
 	LogLevel       string   `mapstructure:"LOG_LEVEL"`
 	LogFormat      string   `mapstructure:"LOG_FORMAT"`
 	LogOutputPaths []string `mapstructure:"LOG_OUTPUT_PATHS"`
+
+
 }
 
 func NewEnv(filePath string) *Env {
